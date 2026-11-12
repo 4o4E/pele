@@ -290,13 +290,14 @@ private fun draw(db: StateDb, config: Config, options: RenderOptions, turned: Bo
         if (node.cssStyles.size > 0) node.cssCompiledStyles + node.cssStyles
         else node.cssCompiledStyles
       )
+    val nodeMeasurer = style.measurer(measurer)
     val textStyle = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val fontSize = style.fontSize ?: size
     view.style = style
     var c: CNode? = null
     when (view.kind) {
       K.Composite -> {
-        view.label = text(node.label, fontSize, 4000.0, textStyle)
+        view.label = layoutLabel(node.label, true, nodeMeasurer, fontSize, 4000.0, textStyle)
         view.titleH = if (view.label.height > 0) view.label.height + 12 else 0.0
         c = group(innerDir(i), GROUP_PAD, view.titleH + GROUP_PAD, GROUP_PAD)
         c.minW = view.label.width + 2 * GROUP_PAD
@@ -322,18 +323,27 @@ private fun draw(db: StateDb, config: Config, options: RenderOptions, turned: Bo
       }
       K.Hidden -> {}
       K.Note -> {
-        view.label = text(node.label, small, max(wrapWidth, NOTE_WRAP), 0)
+        view.label =
+          layoutLabel(node.label, true, nodeMeasurer, small, max(wrapWidth, NOTE_WRAP), 0)
         view.w = view.label.width + 24
         view.h = view.label.height + 16
       }
       else -> {
-        view.label = text(node.label, fontSize, wrapWidth, textStyle)
+        view.label = layoutLabel(node.label, true, nodeMeasurer, fontSize, wrapWidth, textStyle)
         var width = view.label.width
         var height = view.label.height + 2 * PAD_Y
         if (view.kind == K.Described) {
           height += 14
           for (line in node.description) {
-            val label = text(if (line == "") " " else line, small, wrapWidth, textStyle)
+            val label =
+              layoutLabel(
+                if (line == "") " " else line,
+                true,
+                nodeMeasurer,
+                small,
+                wrapWidth,
+                textStyle,
+              )
             view.lines.add(label)
             if (label.width > width) width = label.width
             height += label.height

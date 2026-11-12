@@ -9,6 +9,8 @@ import pele.js.jsReplace
 import pele.js.jsSlice
 import pele.js.jsStr
 import pele.js.jsTrim
+import pele.text.FontFamilyTextMeasurer
+import pele.text.TextMeasurer
 
 // Private aliases set once on the root element, so each use is short and the public
 // --pele-* tokens keep their fallbacks. The text color is set as well: an icon is drawn in
@@ -95,7 +97,12 @@ class ResolvedStyle(
   val bold: Boolean,
   val italic: Boolean,
   val fontSize: Double?,
-)
+  val fontFamily: String? = null,
+) {
+  fun measurer(base: TextMeasurer): TextMeasurer =
+    if (fontFamily != null && base is FontFamilyTextMeasurer) base.withFontFamily(fontFamily)
+    else base
+}
 
 private val NONE =
   ResolvedStyle(
@@ -148,6 +155,7 @@ fun resolveStyle(declarations: List<String>): ResolvedStyle {
         (if (weight == null) Double.NaN else jsNumber(weight)) >= 600,
     italic = text["font-style"] == "italic",
     fontSize = if (px != null && px > 0 && px <= 200) px else null,
+    fontFamily = text["font-family"],
   )
 }
 

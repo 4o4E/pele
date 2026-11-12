@@ -13,7 +13,7 @@ group = "top.e404.pele"
 
 // The upstream Pele version this ports (PELE_VERSION in Pele.kt), plus our own revision counter
 // for releases of the port between upstream versions: 1.12.0.1, 1.12.0.2, ... See UPDATE.md.
-version = "1.12.0.1-java11.1-SNAPSHOT"
+version = "1.12.0.1-java11.2-SNAPSHOT"
 
 repositories { mavenCentral() }
 

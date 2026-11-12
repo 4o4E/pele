@@ -193,6 +193,7 @@ private fun draw(
         if (node.cssStyles.isNotEmpty()) node.cssCompiledStyles + node.cssStyles
         else node.cssCompiledStyles
       )
+    val nodeMeasurer = style.measurer(measurer)
     val textStyle = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val markdown = node.labelType == "markdown"
     val fontSize = style.fontSize ?: size
@@ -203,7 +204,7 @@ private fun draw(
         layoutLabel(
           node.label,
           markdown,
-          measurer,
+          nodeMeasurer,
           fontSize,
           if (variant != null && tight) max(80.0, titleRoom(options) / 2) else 4000.0,
           textStyle,
@@ -222,7 +223,7 @@ private fun draw(
         if (!node.img.isNullOrEmpty() || !node.icon.isNullOrEmpty() || shapeHasLabel(shape))
           node.label
         else null
-      val label = layoutLabel(text, markdown, measurer, fontSize, wrapWidth, textStyle)
+      val label = layoutLabel(text, markdown, nodeMeasurer, fontSize, wrapWidth, textStyle)
       val w: Double
       val h: Double
       var dy: Double

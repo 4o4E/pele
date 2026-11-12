@@ -18,6 +18,11 @@ fun interface TextMeasurer {
   fun width(text: String, size: Double, style: Int): Double
 }
 
+/** Native font measurers can select the same family as a styled SVG label. */
+interface FontFamilyTextMeasurer : TextMeasurer {
+  fun withFontFamily(fontFamily: String): TextMeasurer
+}
+
 private fun unpack(packed: String): IntArray {
   val out = IntArray(95)
   for (i in 0 until 95) out[i] = packed.substring(i * 2, i * 2 + 2).toInt(36)

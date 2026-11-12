@@ -26,6 +26,10 @@ browser-only and not ported; text is measured with the bundled Arial metrics unl
 - oracles from Node for `JSON.parse`, `Date.parse`/`new Date` (three time zones) and `new URL`;
 - concurrent rendering of every golden on 8 threads.
 
+Native font integrations can implement `FontFamilyTextMeasurer`. Styled node labels, member
+cells and fitted text then select their explicit `font-family` during measurement, matching
+the SVG drawing font. The bundled Arial metrics remain an approximate, font-independent estimator.
+
 ## Download
 
 Jars are built, tested and published by the [Kotlin workflow](../.github/workflows/kotlin.yml) when a
@@ -40,7 +44,7 @@ gh attestation verify pele-kotlin-1.12.0.jar --repo <owner>/<repo>
 The jar needs only `kotlin-stdlib` (2.x) on the classpath, and Java 11 or later.
 
 The `build/nexus-java11` branch also publishes
-`top.e404.pele:pele-kotlin:1.12.0.1-java11.1-SNAPSHOT` to
+`top.e404.pele:pele-kotlin:1.12.0.1-java11.2-SNAPSHOT` to
 `https://nexus.e404.top:3443/repository/maven-snapshots/`.
 
 ## Develop

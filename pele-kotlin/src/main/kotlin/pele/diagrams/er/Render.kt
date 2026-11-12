@@ -285,6 +285,7 @@ private fun draw(db: ErDb, config: Config, options: RenderOptions, turned: Boole
         if (node.cssStyles.isNotEmpty()) node.cssCompiledStyles + node.cssStyles
         else node.cssCompiledStyles
       )
+    val nodeMeasurer = style.measurer(measurer)
     val base = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val mono = if (monospaced && !RE_FONT_FAMILY.test(style.text)) Style.Mono else 0
     val nameSize = style.fontSize ?: size
@@ -292,12 +293,12 @@ private fun draw(db: ErDb, config: Config, options: RenderOptions, turned: Boole
     val keySize = style.fontSize ?: jsRound(size * 0.75)
     val label =
       if (node.isGroup) {
-        layoutLabel(node.label, true, measurer, nameSize, 4000.0, base)
+        layoutLabel(node.label, true, nodeMeasurer, nameSize, 4000.0, base)
       } else {
         layoutLabel(
           if (node.alias.isNotEmpty()) node.alias else node.label,
           true,
-          measurer,
+          nodeMeasurer,
           nameSize,
           240.0,
           base,
@@ -350,17 +351,38 @@ private fun draw(db: ErDb, config: Config, options: RenderOptions, turned: Boole
         for (attribute in node.attributes) {
           val cells =
             Cells(
-              layoutLabel(cellText(attribute.type), true, measurer, rowSize, NO_WRAP, base or mono),
-              layoutLabel(cellText(attribute.name), true, measurer, rowSize, NO_WRAP, base or mono),
+              layoutLabel(
+                cellText(attribute.type),
+                true,
+                nodeMeasurer,
+                rowSize,
+                NO_WRAP,
+                base or mono,
+              ),
+              layoutLabel(
+                cellText(attribute.name),
+                true,
+                nodeMeasurer,
+                rowSize,
+                NO_WRAP,
+                base or mono,
+              ),
               layoutLabel(
                 attribute.keys.joinToString(", "),
                 false,
-                measurer,
+                nodeMeasurer,
                 keySize,
                 NO_WRAP,
                 base or mono,
               ),
-              layoutLabel(cellText(attribute.comment), true, measurer, rowSize, COMMENT_WRAP, base),
+              layoutLabel(
+                cellText(attribute.comment),
+                true,
+                nodeMeasurer,
+                rowSize,
+                COMMENT_WRAP,
+                base,
+              ),
             )
           var h = rowLine
           for (k in 0 until 4) {

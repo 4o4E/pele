@@ -264,6 +264,7 @@ private fun draw(
 
   fun classView(node: GraphNode, cls: ClassNode): View {
     val style = classStyle(cls)
+    val nodeMeasurer = style.measurer(measurer)
     val fontSize = style.fontSize ?: size
     val memberSize = jsRound(fontSize * 0.875)
     val lineHeight = jsRound(memberSize * 1.5)
@@ -278,7 +279,7 @@ private fun draw(
       layoutLabel(
         cls.label + generic,
         false,
-        measurer,
+        nodeMeasurer,
         fontSize,
         4000.0,
         Style.Bold or (if (style.italic) Style.Italic else 0),
@@ -291,16 +292,16 @@ private fun draw(
       else NO_TEXT
     val attributes =
       if (cls.members.size > 0)
-        cls.members.map { m -> memberLine(m, measurer, memberSize, mono(style)) }
+        cls.members.map { m -> memberLine(m, nodeMeasurer, memberSize, mono(style)) }
       else NO_LINES
     val methods =
       if (cls.methods.size > 0)
-        cls.methods.map { m -> memberLine(m, measurer, memberSize, mono(style)) }
+        cls.methods.map { m -> memberLine(m, nodeMeasurer, memberSize, mono(style)) }
       else NO_LINES
     var inner = label.width
     var annotationsH = 0.0
     for (a in annotations) {
-      inner = max(inner, if (a is String) measurer.width(a, tiny, 0) else (a as Label).width)
+      inner = max(inner, if (a is String) nodeMeasurer.width(a, tiny, 0) else (a as Label).width)
       annotationsH += if (a is String) tinyHeight else max(tinyHeight, (a as Label).height)
     }
     for (line in attributes) inner = max(inner, line.width)

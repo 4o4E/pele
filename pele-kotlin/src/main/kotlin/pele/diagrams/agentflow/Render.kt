@@ -156,13 +156,14 @@ private fun draw(
       if (node.cssStyles.isNotEmpty()) node.cssCompiledStyles + node.cssStyles
       else node.cssCompiledStyles
     val style = resolveStyle(styles)
+    val nodeMeasurer = style.measurer(measurer)
     val textStyle = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val markdown = node.labelType == "markdown"
     val fontSize = style.fontSize ?: size
     val view: NodeView
     val c: CNode
     if (node.isGroup) {
-      val label = layoutLabel(node.label, markdown, measurer, fontSize, 4000.0, textStyle)
+      val label = layoutLabel(node.label, markdown, nodeMeasurer, fontSize, 4000.0, textStyle)
       view = NodeView(node, style, label, "group", 0.0, 0.0, 0.0, 0)
       c = cnode(0.0, 0.0)
       c.isGroup = true
@@ -172,14 +173,14 @@ private fun draw(
       c.padBottom = GROUP_PAD
       c.minW = label.width + 2 * GROUP_PAD - 12
     } else if (node.shape == "collapsedGroup") {
-      val label = layoutLabel(node.label, markdown, measurer, fontSize, wrapWidth, textStyle)
+      val label = layoutLabel(node.label, markdown, nodeMeasurer, fontSize, wrapWidth, textStyle)
       val w = max(label.width, minWidth) + 2 * PAD_X
       val h = label.height + 2 * PAD_Y + DOTS
       view = NodeView(node, style, label, COLLAPSED, w, h, -DOTS / 2, 0)
       c = cnode(w, h)
     } else {
       val shape = canonicalShape(node.shape)
-      val label = layoutLabel(node.label, markdown, measurer, fontSize, wrapWidth, textStyle)
+      val label = layoutLabel(node.label, markdown, nodeMeasurer, fontSize, wrapWidth, textStyle)
       // A diamond grows twice as fast as its label, so it keeps the label's own width.
       val s =
         shapeSize(

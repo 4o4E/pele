@@ -299,6 +299,7 @@ private fun draw(
         if (node.cssStyles.size > 0) node.cssCompiledStyles + node.cssStyles
         else node.cssCompiledStyles
       )
+    val nodeMeasurer = style.measurer(measurer)
     val base = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val fontSize = style.fontSize ?: size
     val markdown = node.labelType == "markdown"
@@ -306,7 +307,7 @@ private fun draw(
       text(
         if (!node.stereotype.isNullOrEmpty()) "«${node.stereotype}»" else node.stereotype,
         false,
-        measurer,
+        nodeMeasurer,
         tiny,
         200.0,
         base,
@@ -316,7 +317,7 @@ private fun draw(
     val c: CNode
     if (node.isGroup) {
       view.kind = Kind.Boundary
-      view.label = text(node.label, markdown, measurer, fontSize, 4000.0, base)
+      view.label = text(node.label, markdown, nodeMeasurer, fontSize, 4000.0, base)
       val titleH = view.label.height
       c = cnode(0.0, 0.0)
       c.isGroup = true
@@ -329,11 +330,11 @@ private fun draw(
     } else {
       if (node.jsonRows != null) {
         view.kind = Kind.Json
-        view.label = text(node.label, false, measurer, fontSize, 4000.0, base or Style.Bold)
+        view.label = text(node.label, false, nodeMeasurer, fontSize, 4000.0, base or Style.Bold)
         var valueW = 0.0
         for (row in node.jsonRows) {
-          val key = text(row.key, false, measurer, small, 4000.0, base)
-          val value = text(row.value, false, measurer, small, 260.0, base)
+          val key = text(row.key, false, nodeMeasurer, small, 4000.0, base)
+          val value = text(row.value, false, nodeMeasurer, small, 260.0, base)
           view.rows.add(Pair(key, value))
           view.keyW = max(view.keyW, key.width)
           valueW = max(valueW, value.width)
@@ -351,7 +352,7 @@ private fun draw(
         view.h += view.headH
       } else if (!node.actorType.isNullOrEmpty()) {
         view.kind = Kind.Actor
-        view.label = text(node.label, markdown, measurer, fontSize, 140.0, base)
+        view.label = text(node.label, markdown, nodeMeasurer, fontSize, 140.0, base)
         view.w = jsMax(FIGURE_W, view.label.width, stereotype.width)
         view.h = FIGURE_H + FIGURE_GAP + stereotype.height + view.label.height
       } else {
@@ -359,7 +360,7 @@ private fun draw(
           text(
             node.label,
             markdown,
-            measurer,
+            nodeMeasurer,
             if (node.shape == "note") small else fontSize,
             180.0,
             base,

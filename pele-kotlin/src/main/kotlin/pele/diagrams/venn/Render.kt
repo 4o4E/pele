@@ -119,7 +119,13 @@ fun renderVenn(model: VennModel, _config: Config, options: RenderOptions): Rende
     if (!text.isNullOrEmpty()) {
       val fontSize = if (sets.size == 1) size else small
       region.lines.add(
-        Line(null, text, fontSize, base, layoutLabel(text, false, measurer, fontSize, 4000.0, base))
+        Line(
+          null,
+          text,
+          fontSize,
+          base,
+          layoutLabel(text, false, style.measurer(measurer), fontSize, 4000.0, base),
+        )
       )
     }
     regions[key] = region
@@ -128,7 +134,15 @@ fun renderVenn(model: VennModel, _config: Config, options: RenderOptions): Rende
     val raw = node.label ?: node.id
     regions[keyOf(node.sets)]
       ?.lines
-      ?.add(Line(node.id, raw, tiny, 0, layoutLabel(raw, false, measurer, tiny, 4000.0)))
+      ?.add(
+        Line(
+          node.id,
+          raw,
+          tiny,
+          0,
+          layoutLabel(raw, false, styleOf(node.id).measurer(measurer), tiny, 4000.0),
+        )
+      )
   }
 
   // Lengths so far are in units of the layout. The scale gives the largest circle a set radius,
@@ -155,7 +169,15 @@ fun renderVenn(model: VennModel, _config: Config, options: RenderOptions): Rende
     val room = maxOf(region.spot.margin * scale * 1.8, 72.0)
     for (line in region.lines) {
       if (line.label.width > room)
-        line.label = layoutLabel(line.raw, false, measurer, line.size, room, line.base)
+        line.label =
+          layoutLabel(
+            line.raw,
+            false,
+            (if (line.id == null) region.style else styleOf(line.id)).measurer(measurer),
+            line.size,
+            room,
+            line.base,
+          )
     }
   }
 

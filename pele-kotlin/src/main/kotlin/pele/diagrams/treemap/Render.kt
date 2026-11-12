@@ -114,6 +114,7 @@ fun renderTreemap(model: TreemapModel, config: Config, options: RenderOptions): 
   for (b in boxes) {
     val node = b.node
     val style = resolveStyle(node.cssCompiledStyles ?: emptyList())
+    val nodeMeasurer = style.measurer(measurer)
     val color = seriesColor(b.series)
     val x = left + b.x
     val y = top + b.y
@@ -150,7 +151,7 @@ fun renderTreemap(model: TreemapModel, config: Config, options: RenderOptions): 
         val valueSize = fixed ?: tiny
         val room = b.w - 2 * SIDE - 4
         val valueWidth =
-          if (value.isNotEmpty()) measurer.width(value, valueSize, textStyle) else 0.0
+          if (value.isNotEmpty()) nodeMeasurer.width(value, valueSize, textStyle) else 0.0
         val withValue = !short && valueWidth > 0 && room - valueWidth - 12 >= 3 * labelSize
         val label =
           if (labelSize * LINE < b.header) {
@@ -159,7 +160,7 @@ fun renderTreemap(model: TreemapModel, config: Config, options: RenderOptions): 
               if (withValue) room - valueWidth - 12 else room,
               labelSize,
               labelSize,
-              measurer,
+              nodeMeasurer,
               textStyle or Style.Bold,
             )
           } else {
@@ -198,7 +199,8 @@ fun renderTreemap(model: TreemapModel, config: Config, options: RenderOptions): 
       if (fixed == null) minOf(size, floor((b.h - 4) / LINE))
       else if (fixed * LINE <= b.h - 4) fixed else 0.0
     val label =
-      if (tallest >= smallest) fitText(name, room, tallest, smallest, measurer, textStyle) else null
+      if (tallest >= smallest) fitText(name, room, tallest, smallest, nodeMeasurer, textStyle)
+      else null
     if (label != null) {
       val cx = num(x + b.w / 2)
       val cy = y + b.h / 2
@@ -207,7 +209,7 @@ fun renderTreemap(model: TreemapModel, config: Config, options: RenderOptions): 
       if (
         value.isNotEmpty() &&
           lines <= b.h - 4 &&
-          measurer.width(value, valueSize, textStyle) <= room
+          nodeMeasurer.width(value, valueSize, textStyle) <= room
       ) {
         val first = cy - lines / 2 + (label.size * LINE) / 2
         val second = cy + lines / 2 - (valueSize * LINE) / 2

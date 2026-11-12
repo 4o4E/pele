@@ -222,6 +222,7 @@ private fun draw(
   val cnodes = ArrayList<CNode>()
   for (node in graph.nodes) {
     val style = resolveStyle(node.cssStyles)
+    val nodeMeasurer = style.measurer(measurer)
     val base = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val nameSize = style.fontSize ?: size
     val bodySize = style.fontSize ?: small
@@ -232,18 +233,18 @@ private fun draw(
         layoutLabel(
           "«${if (requirement != null) requirement.type else "Element"}»",
           false,
-          measurer,
+          nodeMeasurer,
           bodySize,
           4000.0,
         ),
         base,
-        measurer,
+        nodeMeasurer,
       )
     val name =
       restyle(
-        layoutLabel(node.id, true, measurer, nameSize, NAME_WRAP),
+        layoutLabel(node.id, true, nodeMeasurer, nameSize, NAME_WRAP),
         base or Style.Bold,
-        measurer,
+        nodeMeasurer,
       )
     val fields: List<Pair<String, String>> =
       if (requirement != null) {
@@ -265,8 +266,10 @@ private fun draw(
     var bodyHeight = 0.0
     for ((label, text) in fields) {
       if (text.isEmpty()) continue
-      val key = restyle(layoutLabel(label, false, measurer, bodySize, 4000.0), base, measurer)
-      val value = restyle(layoutLabel(text, true, measurer, bodySize, VALUE_WRAP), base, measurer)
+      val key =
+        restyle(layoutLabel(label, false, nodeMeasurer, bodySize, 4000.0), base, nodeMeasurer)
+      val value =
+        restyle(layoutLabel(text, true, nodeMeasurer, bodySize, VALUE_WRAP), base, nodeMeasurer)
       val height = max(key.height, value.height)
       rows.add(Row(key, value, height))
       keyWidth = max(keyWidth, key.width)

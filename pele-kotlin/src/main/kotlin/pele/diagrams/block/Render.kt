@@ -612,6 +612,7 @@ private fun draw(
   fun view(block: Block, index: Int): View {
     val type = block.type
     val style = if (type == "space") resolveStyle(NO_CLASSES) else styleOf(block)
+    val nodeMeasurer = style.measurer(measurer)
     val textStyle = (if (style.bold) Style.Bold else 0) or (if (style.italic) Style.Italic else 0)
     val fontSize = style.fontSize ?: size
     var kind = Kind.Leaf
@@ -625,14 +626,14 @@ private fun draw(
     var dy = 0.0
     if (type == "space") {
       kind = Kind.Space
-      label = layoutLabel(null, false, measurer, fontSize, wrap)
+      label = layoutLabel(null, false, nodeMeasurer, fontSize, wrap)
     } else if (type == "composite") {
       kind = Kind.Composite
       label =
         layoutLabel(
           block.label,
           false,
-          measurer,
+          nodeMeasurer,
           fontSize,
           if (tight) titleRoom(options) else 4000.0,
           textStyle,
@@ -642,7 +643,7 @@ private fun draw(
       nh = head + 2 * gap
     } else if (type == "block_arrow") {
       kind = Kind.Arrow
-      label = layoutLabel(block.label, false, measurer, fontSize, wrap, textStyle)
+      label = layoutLabel(block.label, false, nodeMeasurer, fontSize, wrap, textStyle)
       var blank = true
       for (line in label.lines) for (part in line) if (
         part.icon != null || part.text.jsTrim() != ""
@@ -656,7 +657,7 @@ private fun draw(
       dy = s.dy
     } else {
       shape = SHAPES[type ?: ""] ?: "rect"
-      label = layoutLabel(block.label, false, measurer, fontSize, wrap, textStyle)
+      label = layoutLabel(block.label, false, nodeMeasurer, fontSize, wrap, textStyle)
       val s = shapeSize(shape, label.width, label.height)
       nw = s.w
       // A cylinder's caps deepen as it widens, so it is sized for the deepest ones.
