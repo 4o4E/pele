@@ -1,15 +1,19 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinJvm
+import com.vanniktech.maven.publish.SourcesJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   kotlin("jvm") version "2.4.21"
   id("com.ncorti.ktfmt.gradle") version "0.27.0"
+  id("com.vanniktech.maven.publish") version "0.37.0"
 }
 
-group = "pele"
+group = "top.e404.pele"
 
 // The upstream Pele version this ports (PELE_VERSION in Pele.kt), plus our own revision counter
 // for releases of the port between upstream versions: 1.12.0.1, 1.12.0.2, ... See UPDATE.md.
-version = "1.12.0.1"
+version = "1.12.0.1-java11.1-SNAPSHOT"
 
 repositories { mavenCentral() }
 
@@ -115,4 +119,48 @@ tasks.register<JavaExec>("benchmarkJourney") {
   classpath = sourceSets.test.get().runtimeClasspath
   mainClass.set("pele.JourneyBenchmarkKt")
   maxHeapSize = "512m"
+}
+
+mavenPublishing {
+  coordinates(project.group.toString(), "pele-kotlin", project.version.toString())
+  configure(KotlinJvm(javadocJar = JavadocJar.Empty(), sourcesJar = SourcesJar.Sources()))
+  pom {
+    name.set("Pele Kotlin Java 11")
+    description.set("Pele Kotlin port rebuilt for Java 11.")
+    url.set("https://github.com/4o4E/pele")
+    licenses {
+      license {
+        name.set("MIT License")
+        url.set("https://opensource.org/licenses/MIT")
+        distribution.set("repo")
+      }
+    }
+    developers {
+      developer {
+        id.set("4o4E")
+        name.set("4o4E")
+        email.set("869951226@qq.com")
+        organization.set("4o4E")
+        organizationUrl.set("https://github.com/4o4E")
+      }
+    }
+    scm {
+      url.set("https://github.com/4o4E/pele")
+      connection.set("scm:git:https://github.com/4o4E/pele.git")
+      developerConnection.set("scm:git:ssh://git@github.com/4o4E/pele.git")
+    }
+  }
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "nexus"
+      url = uri("https://nexus.e404.top:3443/repository/maven-snapshots/")
+      credentials {
+        username = providers.gradleProperty("nexus.username").orNull
+        password = providers.gradleProperty("nexus.password").orNull
+      }
+    }
+  }
 }

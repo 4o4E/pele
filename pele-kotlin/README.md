@@ -39,6 +39,10 @@ gh attestation verify pele-kotlin-1.12.0.jar --repo <owner>/<repo>
 
 The jar needs only `kotlin-stdlib` (2.x) on the classpath, and Java 11 or later.
 
+The `build/nexus-java11` branch also publishes
+`top.e404.pele:pele-kotlin:1.12.0.1-java11.1-SNAPSHOT` to
+`https://nexus.e404.top:3443/repository/maven-snapshots/`.
+
 ## Develop
 
 Requires a JDK (17+; Gradle provisions 21 and 17 toolchains). Golden tests compare the port with SVG
